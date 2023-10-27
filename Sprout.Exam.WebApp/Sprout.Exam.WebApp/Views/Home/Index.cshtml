@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+    </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+
+        <div class="nv-main__intro text-center">
+            <h3 class="nv-title">What do you want to do today?</h3>
+        </div>
+
+        <div class="row mb-5 d-flex justify-content-center">
+            <div class="col-3">
+                <a asp-area="" asp-controller="Employee" asp-action="Index" class="card text-center">
+                    <div class="nv-journey__card__value">
+                        <img height="118" src="~/assets/icons/employees.svg" alt="Employees">
+                    </div>
+                    <h5 class="card-title">View Employees</h5>
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            <p>Please Login to Enter into the System.</p>
+        </div>
+    }
+
+</div>

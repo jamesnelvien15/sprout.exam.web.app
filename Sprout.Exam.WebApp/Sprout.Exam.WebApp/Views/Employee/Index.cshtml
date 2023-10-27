@@ -1,0 +1,239 @@
+﻿@model Sprout.Exam.WebApp.Models.Employee.EmployeeListViewModel
+@{
+    ViewData["Title"] = "View Employees";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" asp-append-version="true" />
+}
+
+    <div class="container">
+        <div class="row">
+            <h1>Employees</h1>
+        </div>
+        <div class="row mt-3 mb-3">
+            <div class="col-12">
+                <a class="btn btn-success btn-sm" id="btnCreate">
+                    Create
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table id="employeeTable" class="table table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Birth Date</th>
+                            <th>TIN</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.List)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@item.Birthdate.ToString("MMMM dd, yyyy")</td>
+                            <td>@item.Tin</td>
+                            <td>@item.EmployeeType</td>
+                            <td>
+                                <a class="btn btn-sm btn-info btnEdit" data-id="@item.Id" data-type="@item.EmployeeTypeId">Edit</a>
+                                <a class="btn btn-sm btn-primary btnCalculate" data-id="@item.Id" data-type="@item.EmployeeTypeId">Calculate</a>
+                                <a class="btn btn-sm btn-danger btnDelete" data-id="@item.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEmployeeModalLabel">Create an Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createEmployeeForm" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" placeholder="Enter your full name here..." aria-describedby="fullNameFeedback" required>
+                            <div id="fullNameFeedback" class="invalid-feedback">
+                                Invalid Full Name.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="birthDate" class="form-label">Birth Date</label>
+                            <input type="date" class="form-control" id="birthDate" placeholder="Select your birth date..." aria-describedby="birthDateFeedback" required>
+                            <div id="birthDateFeedback" class="invalid-feedback">
+                                Invalid Birthdate.
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="tin" class="form-label">TIN</label>
+                            <input type="text" class="form-control" id="tin" placeholder="Enter your TIN here..." aria-describedby="tinFeedback" required>
+                            <div id="tinFeedback" class="invalid-feedback">
+                                Invalid TIN.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="employeeType" class="form-label">Employee Type</label>
+                            <select class="form-control" id="employeeType" aria-describedby="employeeTypeFeedback" required>
+                                <option value="0" selected disabled>Select employee type here...</option>
+                                @foreach (var item in Model.EmployeeTypeList)
+                                {
+                                    <option value="@item.Id">@item.TypeName</option>
+                                }
+                            </select>
+                            <div id="employeeTypeFeedback" class="invalid-feedback">
+                                Invalid Employee Type.
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="btnSaveCreate">Save</a>
+                <a class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEmployeeModalLabel">Edit an Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEmployeeForm" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="editFullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editFullName" placeholder="Enter your full name here..." aria-describedby="fullNameFeedback" required>
+                            <div id="editFullNameFeedback" class="invalid-feedback">
+                                Invalid Full Name.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="editBirthDate" class="form-label">Birth Date</label>
+                            <input type="date" class="form-control" id="editBirthDate" placeholder="Select your birth date..." aria-describedby="editBirthDateFeedback" required>
+                            <div id="editBirthDateFeedback" class="invalid-feedback">
+                                Invalid Birthdate.
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="editTin" class="form-label">TIN</label>
+                            <input type="text" class="form-control" id="editTin" placeholder="Enter your TIN here..." aria-describedby="editTinFeedback" required>
+                            <div id="editTinFeedback" class="invalid-feedback">
+                                Invalid TIN.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="editEmployeeType" class="form-label">Employee Type</label>
+                            <select class="form-control" id="editEmployeeType" aria-describedby="editEmployeeTypeFeedback" required>
+                                <option value="0" selected disabled>Select employee type here...</option>
+                                @foreach (var item in Model.EmployeeTypeList)
+                                {
+                                    <option value="@item.Id">@item.TypeName</option>
+                                }
+                            </select>
+                            <div id="editEmployeeTypeFeedback" class="invalid-feedback">
+                                Invalid Employee Type.
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="btnSaveUpdate">Update</a>
+                <a class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="computeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="computeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="computeModalLabel">Compute Salary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="computeForm" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-8">
+                            <label for="computeFullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="computeFullName" placeholder="Enter your full name here..." disabled>
+                        </div>
+                        <div class="col-4">
+                            <label for="computeEmployeeType" class="form-label">Employee Type</label>
+                            <select class="form-control" id="computeEmployeeType" disabled>
+                                <option value="0" selected disabled>Select employee type here...</option>
+                                @foreach (var item in Model.EmployeeTypeList)
+                                {
+                                    <option value="@item.Id">@item.TypeName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6 mt-3">
+                            <label for="basicRate" class="form-label">Basic Rate</label>
+                            <input type="text" class="form-control decimal" id="basicRate" placeholder="0.00" required>
+                        </div>
+                        <div class="col-6 mt-3 d-none">
+                            <label for="daysAbsent" class="form-label decimal">Number of Day/s Absent</label>
+                            <input type="text" class="form-control decimal" id="daysAbsent" placeholder="0.00">
+                        </div>
+                        <div class="col-6 mt-3 d-none">
+                            <label for="daysPresent" class="form-label decimal">Number of Work Day/s</label>
+                            <input type="text" class="form-control decimal" id="daysPresent" placeholder="0.00">
+                        </div>
+                        <div class="col-6 mt-3 d-none">
+                            <label for="hoursWorked" class="form-label decimal">Number of Hour/s per Day</label>
+                            <input type="text" class="form-control decimal" id="hoursWorked" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <label for="totalPay" class="form-label">Total Pay</label>
+                            <input type="text" class="form-control" id="totalPay" disabled>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="btnCompute">Compute</a>
+                <a class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts{
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" asp-append-version="true"></script>
+    <script src="~/js/employee/list.js" asp-append-version="true"></script>
+}
